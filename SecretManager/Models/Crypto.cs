@@ -1,22 +1,30 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace SecretManager.Models
 {
-    internal  static class Crypto
+    internal static class Crypto
     {
-        static readonly string key = "CPA".PadLeft(32);
-        
+ 
+        /// <summary>
+        /// Шифрование текста по протокоул AES
+        /// </summary>
+        /// <param name="plainText">Текст</param>
+        /// <param name="cipherKey">Ключ шифрования</param>
+        /// <returns></returns>
         public static string Encrypt(string plainText, string cipherKey)
         {
+            var key = cipherKey.PadLeft(32);
             byte[] iv = new byte[16];
             byte[] array;
-
+            var cryptoKey = Encoding.UTF8.GetBytes(key).Take(32);
+            
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.Key = cryptoKey.ToArray();
                 aes.IV = iv;
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
@@ -29,22 +37,30 @@ namespace SecretManager.Models
                         {
                             streamWriter.Write(plainText);
                         }
-
                         array = memoryStream.ToArray();
                     }
                 }
             }
             return Convert.ToBase64String(array);
         }
-        
-        public static string Decrypt(string cipherText)
+
+
+        /// <summary>
+        /// Расшифрока зашифрованной строки по протоколу AES
+        /// </summary>
+        /// <param name="cipherText">Зашифрованный текст</param>
+        /// <param name="cipherKey">Ключ шифрования</param>
+        /// <returns></returns>
+        public static string Decrypt(string cipherText,string cipherKey)
         {
+            var key = cipherKey.PadLeft(32);
             byte[] iv = new byte[16];
             byte[] buffer = Convert.FromBase64String(cipherText);
+            var cryptoKey = Encoding.UTF8.GetBytes(key).Take(32);
 
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.Key = cryptoKey.ToArray();
                 aes.IV = iv;
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 

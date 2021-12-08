@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using SecretManager.Models;
 
@@ -11,8 +10,12 @@ namespace Example
         {
             Console.WriteLine("~Тестовый образец~");
 
+
+
             var secret = new ImportantSecrets();
-            var manager = new SecretManaged("Пока не работает","TestDirectory","TestSecretFile",null);
+            var manager = new SecretManaged("Ключ работает, но берет первые 32 бита для шифрования","TestDirectory","TestSecretFile",null);
+
+            Console.WriteLine($"Проверки наличия файла:{manager.SecretFileExists()}");
 
             var json1 = JsonSerializer.Serialize(secret);
             Console.WriteLine("Загружаемое значение:");

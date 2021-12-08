@@ -5,16 +5,23 @@ using System.Text.Json;
 
 namespace SecretManager.Models
 {
+    /// <summary>
+    /// Записыватель секретов
+    /// </summary>
     internal class SecretWriter
     {
-        public void Set<T>(string path,string cipherKey, T data) where T : class, new()
+        /// <summary>
+        /// Сохранить секрет в файл
+        /// </summary>
+        /// <typeparam name="T">Сохраняемый тип</typeparam>
+        /// <param name="fullPath">Путь сохранения секрета</param>
+        /// <param name="cipherKey">Ключ шифрования</param>
+        /// <param name="data">Данные для записи</param>
+        public void Set<T>(string fullPath, string cipherKey, T data) where T : class, new()
         {
             var lockObject = new object();
-            var fullPath = path;
             var text = JsonSerializer.Serialize(data);
             var encryptText=Crypto.Encrypt(text,cipherKey);
-            // var plainTextBytes = Encoding.UTF8.GetBytes(text);
-            // var save = Convert.ToBase64String(plainTextBytes);
             lock (lockObject)
             {
                 if (!Directory.Exists(Path.GetDirectoryName(fullPath)))
@@ -22,7 +29,6 @@ namespace SecretManager.Models
                 
                 using (var writer = new StreamWriter(fullPath, false, Encoding.Default))
                 {
-                    //writer.WriteLine(save);
                     writer.WriteLine(encryptText);
                 }
             }
