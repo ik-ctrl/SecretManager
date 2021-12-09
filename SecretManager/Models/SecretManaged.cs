@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace SecretManager.Models
@@ -7,101 +10,154 @@ namespace SecretManager.Models
     /// <summary>
     ///Менеджер для работы с сохранеными секретами
     /// </summary>
-    public class SecretManaged
+    public static class SecretManaged
     {
-        private readonly ILogger<SecretManaged> _logger;
-        private readonly SecretReader _reader;
-        private readonly SecretWriter _writer;
-        private readonly string _key;
-        private readonly string _fileName;
-        private readonly string _directoryName;
-
-        /// <summary>
-        /// Инициализация
-        /// </summary>
-        /// <param name="key">Ключ шифрования</param>
-        /// <param name="directoryName">Наименова директории хранения</param>
-        /// <param name="secretFileName">Наименования файла хранения без расширения</param>
-        /// <param name="logger">Журнла логгирования</param>
-        public SecretManaged(string key, string directoryName = null, string secretFileName = null, ILogger<SecretManaged> logger = null)
-        {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(key);
-            _key = key.Trim();
-
-            _directoryName = string.IsNullOrEmpty(directoryName) ? "Secrets" : secretFileName;
-            _fileName = string.IsNullOrEmpty(secretFileName) ? "secret" : secretFileName;
-
-            _reader = new SecretReader();
-            _writer = new SecretWriter();
-            _logger = logger;
-        }
-
-        /// <summary>
-        /// Проверка наличия файла с  конфиденциальной информацией
-        /// </summary>
-        /// <returns>Результат проверки</returns>
-        public bool SecretFileExists()
-        {
-            try
-            {
-                return File.Exists(GetFullPath());
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, $"Не удалось проверить наличия файла c конфиденциальной информацией. Причина: {ex.Message}");
-                return false;
-            }
-        }
-
-
         /// <summary>
         /// Запрос сохраненого секрета 
         /// </summary>
         /// <typeparam name="T">DTO для маппига</typeparam>
         /// <returns>Запрос сохраненого</returns>
-        public T Get<T>() where T : class, new()
+        public static T Get<T>(ILogger logger = null) where T : class, new()
         {
             try
             {
-                return _reader.Get<T>(GetFullPath(), _key);
+                var callingAssemblyLocation = Assembly.GetCallingAssembly().Location;
+                var path = GetFullPath(callingAssemblyLocation);
+                var key = GetKey(callingAssemblyLocation);
+                
+                if(!SecretFileExists(path))
+                {
+                    var data = new T();
+                    SecretWriter.Set(path, key, data);
+                }
+                return SecretReader.Get<T>(path, key);
             }
             catch (Exception e)
             {
-                _logger?.LogError(e, $"Не удалось прочитать данные. Причина: {e.Message}");
-                throw;
+                logger?.LogError(e, $"Не удалось прочитать данные. Причина: {e.Message}");
+                return null;
             }
         }
-
+        
         /// <summary>
-        ///  Запись секрета
+        /// Запись секрета
         /// </summary>
         /// <typeparam name="T">DTO записываемого секрета</typeparam>
         /// <param name="data">Данные для записи</param>
+        /// <param name="logger">Журнал логгирования операции</param>
         /// <returns>Результат операции</returns>
-        public bool Set<T>(T data) where T : class, new()
+        public static bool Set<T>(T data, ILogger logger = null) where T : class, new()
         {
             try
             {
                 if (data == null)
                     throw new ArgumentNullException(nameof(data));
-
-                var path = GetFullPath();
-                _writer.Set(path, _key, data);
+                var callingAssemblyLocation = Assembly.GetCallingAssembly().Location;
+                var path = GetFullPath(callingAssemblyLocation);
+                var key = GetKey(callingAssemblyLocation);
+                SecretWriter.Set(path, key, data);
                 return true;
             }
             catch (Exception e)
             {
-                _logger?.LogError(e, $"Не удалось записать данные. Причина: {e.Message}");
+                logger?.LogError(e, $"Не удалось записать данные. Причина: {e.Message}");
                 return false;
             }
         }
 
+        /// <summary>
+        /// Удаление файла с секретом
+        /// </summary>
+        /// <param name="logger">Журнал логгирования операции</param>
+        /// <returns>Результат операции</returns>
+        public static bool DeleteSecret(ILogger logger = null)
+        {
+            try
+            {
+                var calledAssemblyLocation = Assembly.GetCallingAssembly().Location;
+                var location = GetFullPath(calledAssemblyLocation);
+                if (File.Exists(location))
+                {
+                    File.Delete(location);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                logger?.LogError(e, $"Не удалить секрет. Причина: {e.Message}");
+                return false;
+            }
+        } 
+        
+        /// <summary>
+        /// Проверка наличия файла с  конфиденциальной информацией
+        /// </summary>
+        /// <param name="path">Путь к проверяемому файлу</param>
+        /// <param name="logger">Журнал логирования сообщения </param>
+        /// <returns>Результат проверки</returns>
+        private static bool SecretFileExists(string path, ILogger logger=null)
+        {
+            try
+            {
+                return File.Exists(path);
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, $"Не удалось проверить наличия файла c конфиденциальной информацией. Причина: {ex.Message}");
+                return false;
+            }
+        }
 
         /// <summary>
         /// Формирования полнрго пути к файлу
         /// </summary>
         /// <returns>Полный до файла</returns>
-        private string GetFullPath() => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), _directoryName, $"{_fileName}.txt");
+        private static string GetFullPath(string callingAssemblyLocation)
+        {
+            if (string.IsNullOrEmpty(callingAssemblyLocation))
+                throw new ArgumentNullException(callingAssemblyLocation, "Не удалось установить имя вызывающей сборки");
+
+            var directoryName = $"[{ComputeName(callingAssemblyLocation, 7)}]";
+            var fileName = $"{ComputeName(Path.GetFileName(callingAssemblyLocation), 5, "")}";
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), directoryName, $"{fileName}.txt");
+        }
+
+        /// <summary>
+        /// Вычисление имени
+        /// </summary>
+        /// <param name="path">Локация вызывающего приложения</param>
+        /// <param name="byteCount">Необходимое количество байтов в имени</param>
+        /// <param name="separator">Разделитель между байтами</param>
+        /// <returns>Зашифрованное валидное имя</returns>
+        private static string ComputeName(string path, int byteCount, string separator = "-")
+        {
+            if (byteCount <= 0)
+                throw new ArgumentException("Не корректно задано значение необходимых байтов (byteCount <= 0)");
+
+            byte[] bytes = Encoding.Unicode.GetBytes(path);
+
+            var hasher = new SHA256Managed();
+            var hash = hasher.ComputeHash(bytes);
+            var name = string.Empty;
+            var hashLength = hash.Length;
+            if (hashLength < byteCount)
+                byteCount = hashLength;
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < byteCount; i++)
+            {
+                sb.Append(hash[i]);
+                if (i != byteCount - 1)
+                    sb.Append(separator);
+            }
+            return sb.ToString();
+        }
+        
+        /// <summary>
+        ///  Запрос ключа шифрования для вызова пути
+        /// </summary>
+        /// <param name="location">Путь сборки вызвавшая метод</param>
+        /// <returns>Ключ шифрования</returns>
+        private static string GetKey(string location) => Path.GetFileName(location);
     }
 }
