@@ -9,24 +9,23 @@ namespace Example
         static void Main(string[] args)
         {
             Console.WriteLine("~Тестовый образец~");
+            var secret = new ImportantSecrets()
+            {
+                Secret1 = "Hello",
+                Secret2 = "World",
+                Secret3 = "!!!!"
+            };
+            Console.WriteLine($"Записываем=>{JsonSerializer.Serialize(secret)}");
+            var result = SecretManaged.Set(secret);
+            Console.WriteLine($"Результат операции записи:{result}");
+            
+            var returnSecret = SecretManaged.Get<ImportantSecrets>();
+            Console.WriteLine($"Возвращаемое значение=>{JsonSerializer.Serialize(returnSecret)}");
+            
+            Console.WriteLine($"Результат удаления секрета:{SecretManaged.DeleteSecret()}");
 
-
-
-            var secret = new ImportantSecrets();
-            var manager = new SecretManaged("Ключ работает, но берет первые 32 бита для шифрования","TestDirectory","TestSecretFile",null);
-
-            Console.WriteLine($"Проверки наличия файла:{manager.SecretFileExists()}");
-
-            var json1 = JsonSerializer.Serialize(secret);
-            Console.WriteLine("Загружаемое значение:");
-            Console.WriteLine(json1);
-            manager.Set(secret);
-
-            var returnSecret = manager.Get<ImportantSecrets>();
-            var json2 = JsonSerializer.Serialize(returnSecret);
-            Console.WriteLine("Полученное значение");
-            Console.WriteLine(json2);
-
+            var emptySecret = SecretManaged.Get<ImportantSecrets>();
+            Console.WriteLine($"Считывание серета если файла нет (значение по умолчанию)=>{JsonSerializer.Serialize(emptySecret)}");
             Console.WriteLine("~Конец~");
         }
     }
