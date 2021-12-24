@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -117,8 +118,8 @@ namespace SecretManager.Models
             if (string.IsNullOrEmpty(callingAssemblyLocation))
                 throw new ArgumentNullException(callingAssemblyLocation, "Не удалось установить имя вызывающей сборки");
 
-            var directoryName = $"[{ComputeName(callingAssemblyLocation, 7)}]";
-            var fileName = $"{ComputeName(Path.GetFileName(callingAssemblyLocation), 5, "")}";
+            var directoryName = $"[{ComputeName(callingAssemblyLocation)}]";
+            var fileName = $"{ComputeName(Path.GetFileName(callingAssemblyLocation))}";
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), directoryName, $"{fileName}.txt");
         }
 
@@ -126,31 +127,13 @@ namespace SecretManager.Models
         /// Вычисление имени
         /// </summary>
         /// <param name="path">Локация вызывающего приложения</param>
-        /// <param name="byteCount">Необходимое количество байтов в имени</param>
-        /// <param name="separator">Разделитель между байтами</param>
         /// <returns>Зашифрованное валидное имя</returns>
-        private static string ComputeName(string path, int byteCount, string separator = "-")
+        private static string ComputeName(string path)
         {
-            if (byteCount <= 0)
-                throw new ArgumentException("Не корректно задано значение необходимых байтов (byteCount <= 0)");
-
-            byte[] bytes = Encoding.Unicode.GetBytes(path);
-
+            var bytes= Encoding.Unicode.GetBytes(path);
             var hasher = new SHA256Managed();
             var hash = hasher.ComputeHash(bytes);
-            var name = string.Empty;
-            var hashLength = hash.Length;
-            if (hashLength < byteCount)
-                byteCount = hashLength;
-
-            var sb = new StringBuilder();
-            for (var i = 0; i < byteCount; i++)
-            {
-                sb.Append(hash[i]);
-                if (i != byteCount - 1)
-                    sb.Append(separator);
-            }
-            return sb.ToString();
+            return new Guid(hash.Take(16).ToArray()).ToString();
         }
         
         /// <summary>
