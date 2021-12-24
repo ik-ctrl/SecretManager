@@ -1,0 +1,12 @@
+<#@ template language="C#" #>
+using System.Reflection;
+
+[assembly:AssemblyVersion("<#= majorVersion #>.<#= minorVersion #>.<#= dateInfo #>.<#= revision #>")]
+<#+
+    int majorVersion = 1;
+    int minorVersion = 0;
+    static string currentMonth = DateTime.Now.Month.ToString();
+    static string currentYear = DateTime.Now.Year.ToString();
+    string dateInfo = currentMonth + currentYear.Substring(currentYear.Length - 2);
+    int revision = DateTime.UtcNow.TimeOfDay.Minutes;
+#>

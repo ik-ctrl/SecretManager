@@ -9,19 +9,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d1f50842-ef0c-4186-87a1-4284600e7218" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Example/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Example/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SecretManager/AutoVersionIncrement/AutoVersionIncrement.tt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.SecretManager/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SecretManager/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SecretManager/Models/SecretManaged.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SecretManager/Models/SecretManaged.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SecretManager/SecretManager.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SecretManager/SecretManager.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="T4 File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/SecretManager/Models/Crypto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/28be434f13d647688f5ff1b9d2bc98278f5778/75/Convert.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SecretManager/Models/SecretReader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SecretManager/Models/SecretWriter.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="222x98DEoVyXUk4WKN2zmRZnrRa" />
   <component name="ProjectViewState">
@@ -29,11 +41,16 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34995976" />
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.0" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager">
@@ -70,7 +87,7 @@
       <option name="presentableId" value="Default" />
       <updated>1639049332908</updated>
       <workItem from="1639049332908" duration="5000" />
-      <workItem from="1640331580441" duration="766000" />
+      <workItem from="1640331580441" duration="3633000" />
     </task>
     <servers />
   </component>
@@ -80,23 +97,18 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/SecretManager/Models/SecretManaged.cs</url>
-          <line>138</line>
-          <properties documentPath="D:\DEV\SecretManager\SecretManager\Models\SecretManaged.cs" initialLine="138" containingFunctionPresentation="method 'ComputeName'">
-            <startOffsets>
-              <option value="5234" />
-            </startOffsets>
-            <endOffsets>
-              <option value="5286" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>

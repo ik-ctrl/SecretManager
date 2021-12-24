@@ -117,7 +117,6 @@ namespace SecretManager.Models
         {
             if (string.IsNullOrEmpty(callingAssemblyLocation))
                 throw new ArgumentNullException(callingAssemblyLocation, "Не удалось установить имя вызывающей сборки");
-
             var directoryName = $"[{ComputeName(callingAssemblyLocation)}]";
             var fileName = $"{ComputeName(Path.GetFileName(callingAssemblyLocation))}";
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), directoryName, $"{fileName}.txt");
